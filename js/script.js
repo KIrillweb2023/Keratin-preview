@@ -223,6 +223,10 @@ closeModalForm.addEventListener("click", e => {
 closeModalContinue.addEventListener("click", e => {
   modalContinue.classList.remove('continue_active');
 });
+const formCheck = document.querySelector(".modal-form_check");
+formCheck.addEventListener("click", e => {
+  formCheck.classList.toggle("modal-form_check__active");
+});
 
 /***/ })
 
