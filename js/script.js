@@ -90,8 +90,12 @@
 /*!************************!*\
   !*** ./src/js/main.js ***!
   \************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _modules_Slider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modules/Slider */ "./src/js/modules/Slider.js");
 
 let item = document.querySelectorAll(".question-item");
 item.forEach(item => {
@@ -183,32 +187,6 @@ function onClickEventTab() {
   });
 }
 onClickEventTab();
-const next = document.querySelector(".reviews-pag_next");
-const prev = document.querySelector(".reviews-pag_prev");
-const containerSlide = document.querySelector(".reviews-slider-container");
-const widthSlide = containerSlide.children[0].clientWidth;
-let transformSlide = 0;
-let indexSlide = 0;
-window.addEventListener("resize", () => {
-  nextSlide();
-  prevSlide();
-});
-function nextSlide() {
-  next.addEventListener("click", e => {
-    indexSlide === 4 ? (indexSlide = 0, transformSlide = 0) : (indexSlide++, transformSlide += widthSlide + 15);
-    containerSlide.style.transform = `translateX(-${transformSlide}px)`;
-    console.log(indexSlide);
-  });
-}
-function prevSlide() {
-  prev.addEventListener("click", e => {
-    indexSlide === 0 ? (indexSlide = 4, transformSlide += widthSlide * 3 + 45) : (indexSlide--, transformSlide -= widthSlide + 15);
-    containerSlide.style.transform = `translateX(-${transformSlide}px)`;
-    console.log(indexSlide);
-  });
-}
-nextSlide();
-prevSlide();
 const modalForm = document.querySelector(".modal");
 const modalContinue = document.querySelector(".continue");
 const closeModalForm = document.querySelector(".modal-close");
@@ -227,6 +205,233 @@ const formCheck = document.querySelector(".modal-form_check");
 formCheck.addEventListener("click", e => {
   formCheck.classList.toggle("modal-form_check__active");
 });
+const formFooter = document.querySelector(".footer-form");
+const formModal = document.querySelector(".modal-form");
+mailerPush(formFooter, "name-footer-input", "number-footer-input", "email-footer-input", "message-footer-input");
+mailerPush(formModal, "name-modal-input", "number-modal-input", "email-modal-input", "message-modal-input");
+function mailerPush(form, nameID, numberID, emailID, messageID) {
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const nameI = document.getElementById(nameID).value;
+    const emailI = document.getElementById(emailID).value;
+    const numberI = document.getElementById(numberID).value;
+    const messageI = document.getElementById(messageID).value;
+    const formData = new FormData();
+    formData.append('name', nameI);
+    formData.append('email', emailI);
+    formData.append('number', numberI);
+    formData.append('message', messageI);
+    console.log(formData);
+    fetch('mailer/smart.php', {
+      method: 'POST',
+      body: formData
+    }).then(response => {
+      if (response.ok) {
+        return response.text();
+      } else {
+        throw new Error('Network response was not ok.');
+      }
+    }).then(data => {
+      form.reset();
+      console.log(data);
+    }).catch(error => {
+      console.log(error);
+    });
+  });
+}
+document.addEventListener("DOMContentLoaded", e => {
+  const Slime = new _modules_Slider__WEBPACK_IMPORTED_MODULE_0__["default"]({
+    sliderClass: ".reviews",
+    navigation: {
+      nextSlideBtn: ".reviews-navigation-next",
+      prevSlideBtn: ".reviews-navigation-prev"
+    },
+    previewSlides: 4,
+    speedSlider: 0.6,
+    previewScrollSlide: 3,
+    pagination: true,
+    breakpoints: [{
+      breakpointSize: 1300,
+      previewScrollSlide: 3,
+      previewSlides: 3
+    }, {
+      breakpointSize: 900,
+      previewScrollSlide: 2,
+      previewSlides: 2
+    }, {
+      breakpointSize: 600,
+      previewScrollSlide: 1,
+      previewSlides: 1
+    }]
+  });
+  Slime.InitSlider();
+});
+
+/***/ }),
+
+/***/ "./src/js/modules/Slider.js":
+/*!**********************************!*\
+  !*** ./src/js/modules/Slider.js ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+class SlimeInit {
+  constructor({
+    sliderClass = "",
+    navigation = {
+      nextSlideBtn: "",
+      prevSlideBtn: ""
+    },
+    previewSlides = 1,
+    speedSlider = 0.5,
+    previewScrollSlide = 1,
+    breakpoints = [],
+    pagination = false
+  }) {
+    _defineProperty(this, "InitSliderStylesContainer", () => {
+      // настраивание ширины слайдов и их контейнера
+      this._SlideWidth = this._Slider.clientWidth / this.previewSlides;
+      this._Slide.forEach(item => {
+        item.style.width = `${this._SlideWidth}px`;
+      });
+      this._ContainerSlide.style.width = `${this.NumberSlide * this._SlideWidth}px`;
+      this._ContainerSlide.style.display = "flex";
+      this._ContainerSlide.style.transition = `transform ${this.speedSlider}s ease-in-out`;
+      this.ScrollingSlide();
+      this.BreakpointSlider();
+    });
+    _defineProperty(this, "ScrollingSlide", () => {
+      // Прокрутка слайдера
+      this._ContainerSlide.style.transform = `translateX(-${this._TransformSlide}px)`;
+    });
+    _defineProperty(this, "NextScrolling", () => {
+      const maxIndexSlide = this.NumberSlide - this.previewSlides;
+      this._IndexSlide = this._IndexSlide < maxIndexSlide ? Math.min(this._IndexSlide + this.previewScrollSlide, maxIndexSlide) : 0;
+      this._TransformSlide = this._IndexSlide * this._SlideWidth;
+      this.ScrollingSlide();
+      this.UpdatePaginationSlider();
+    });
+    _defineProperty(this, "PrevScrolling", () => {
+      const maxIndexSlide = this.NumberSlide - this.previewSlides;
+      this._IndexSlide = this._IndexSlide > 0 ? Math.max(this._IndexSlide - this.previewScrollSlide, 0) : this.NumberSlide > this.previewSlides ? maxIndexSlide : 0;
+      this._TransformSlide = this._IndexSlide * this._SlideWidth;
+      this.ScrollingSlide();
+      this.UpdatePaginationSlider();
+    });
+    _defineProperty(this, "InitEventBtnsSlider", () => {
+      if (!this.navigation.nextSlideBtn || !this.navigation.prevSlideBtn) return;
+      const _NextBtnSlide = document.querySelector(this.navigation.nextSlideBtn);
+      const _PrevBtnSlide = document.querySelector(this.navigation.prevSlideBtn);
+      _NextBtnSlide.addEventListener("click", () => this.NextScrolling());
+      _PrevBtnSlide.addEventListener("click", () => this.PrevScrolling());
+    });
+    _defineProperty(this, "ThisWindowResizeSlide", () => {
+      window.addEventListener("resize", e => {
+        this.BreakpointSlider();
+        this.InitSliderStylesContainer();
+        this.PaginationSlider();
+        this.UpdatePaginationSlider();
+        this._TransformSlide = 0;
+        this._IndexSlide = 0;
+      });
+    });
+    _defineProperty(this, "PaginationSlider", () => {
+      if (this.pagination === true) {
+        const paginationContainer = document.querySelector(".reviews-pagination");
+        let paginationNumbers = 0;
+        if (this.NumberSlide > this.previewSlides) {
+          paginationNumbers = Math.ceil((this.NumberSlide - this.previewSlides) / this.previewScrollSlide) + 1;
+        } else {
+          paginationNumbers = 1;
+        }
+        paginationContainer.innerHTML = "";
+        for (let i = 0; i < paginationNumbers; i++) {
+          const paginationItem = document.createElement("li");
+          paginationItem.classList.add("reviews-pagination-item");
+          paginationItem.addEventListener("click", () => this.getIndexSlider(i));
+          paginationContainer.appendChild(paginationItem);
+        }
+        this.UpdatePaginationSlider();
+      }
+    });
+    _defineProperty(this, "UpdatePaginationSlider", () => {
+      const paginationContainer = document.querySelector(".reviews-pagination");
+      const indicators = paginationContainer.querySelectorAll(".reviews-pagination-item");
+      indicators.forEach(indicator => indicator.classList.remove("active"));
+      const maxIndexSlide = this.NumberSlide - this.previewSlides;
+      let activeIndex = Math.ceil(this._IndexSlide / this.previewScrollSlide);
+      if (maxIndexSlide < 0) {
+        activeIndex = 0;
+      } else if (this._IndexSlide >= maxIndexSlide) {
+        activeIndex = indicators.length > 0 ? indicators.length - 1 : 0;
+      }
+      activeIndex = Math.min(activeIndex, indicators.length - 1);
+      activeIndex = Math.max(activeIndex, 0);
+      if (activeIndex >= 0 && activeIndex < indicators.length) {
+        indicators[activeIndex].classList.add("active");
+      }
+    });
+    _defineProperty(this, "getIndexSlider", index => {
+      const maxIndexSlide = this.NumberSlide - this.previewSlides;
+      let newIndexSlide = index * this.previewScrollSlide;
+      newIndexSlide = Math.min(newIndexSlide, maxIndexSlide);
+      this._IndexSlide = newIndexSlide;
+      this._TransformSlide = this._IndexSlide * this._SlideWidth;
+      this.ScrollingSlide();
+      this.UpdatePaginationSlider();
+    });
+    _defineProperty(this, "BreakpointSlider", () => {
+      if (!this.breakpoints) return;
+      const _WidthWindow = window.innerWidth;
+      let breakpointConfirm = false;
+      this.breakpoints.sort((a, b) => b.breakpoint - a.breakpoint);
+      for (let i = 0; i < this.breakpoints.length; i++) {
+        const item = this.breakpoints[i];
+        if (_WidthWindow <= item.breakpointSize) {
+          this.previewSlides = item.previewSlides;
+          this.previewScrollSlide = item.previewScrollSlide;
+          breakpointConfirm = true;
+          // break; // если включить то брекпоинты не будут работать полностью
+        }
+      }
+      if (!breakpointConfirm) {
+        this.previewSlides = this._ConfirmPreviewSlide;
+        this.previewScrollSlide = this._ConfirmScrollSlide;
+      }
+    });
+    _defineProperty(this, "InitSlider", () => {
+      this.BreakpointSlider();
+      this.InitSliderStylesContainer();
+      this.ThisWindowResizeSlide();
+      this.InitEventBtnsSlider();
+      this.PaginationSlider();
+      this.UpdatePaginationSlider();
+    });
+    this.sliderClass = sliderClass;
+    this._ContainerSlide = document.querySelector(`${this.sliderClass}-slides`); // контейнер слайдов
+    this._Slide = document.querySelectorAll(`${this.sliderClass}-slide`); // сами слайды
+    this._Slider = document.querySelector(`${this.sliderClass}-container`); // слайдер в общем
+
+    this.previewSlides = previewSlides;
+    this.navigation = navigation;
+    this.speedSlider = speedSlider;
+    this.previewScrollSlide = previewScrollSlide;
+    this.breakpoints = breakpoints;
+    this.pagination = pagination;
+    this._ConfirmScrollSlide = this.previewScrollSlide;
+    this._ConfirmPreviewSlide = this.previewSlides;
+    this._TransformSlide = 0; // расчетная переменная для перелистывания слайдера
+    this._IndexSlide = 0; // индекс слайдера
+    this.NumberSlide = this._ContainerSlide.children.length; // количество слайдов
+  }
+}
+/* harmony default export */ __webpack_exports__["default"] = (SlimeInit);
 
 /***/ })
 
